@@ -2,11 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+
 def show_values(pc, fmt="%.2f", **kw):
     '''
     Heatmap with text in each cell with matplotlib's pyplot
-    Source: https://stackoverflow.com/a/25074150/395857 
-    By HYRY
     '''
     pc.update_scalarmappable()
     ax = pc.axes
@@ -24,8 +23,6 @@ def show_values(pc, fmt="%.2f", **kw):
 def cm2inch(*tupl):
     '''
     Specify figure size in centimeter in matplotlib
-    Source: https://stackoverflow.com/a/22787457/395857
-    By gns-ank
     '''
     inch = 2.54
     if type(tupl[0]) == tuple:
@@ -36,9 +33,6 @@ def cm2inch(*tupl):
 
 def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=40, figure_height=20, correct_orientation=False, cmap='RdBu'):
     '''
-    Inspired by:
-    - https://stackoverflow.com/a/16124677/395857 
-    - https://stackoverflow.com/a/25074150/395857
     '''
 
     # Plot it out
@@ -94,7 +88,6 @@ def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=4
 def plot_classification_report(classification_report, title='Classification report ', cmap='RdBu'):
     '''
     Plot scikit-learn classification report.
-    Extension based on https://stackoverflow.com/a/31689645/395857 
     '''
     lines = classification_report.split('\n')
 
