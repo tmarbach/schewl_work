@@ -43,6 +43,7 @@ def arguments():
             default=False, 
             type=str
             )
+            #TAKE OUT FLAG BELOW
     parser.add_argument(
             "-s",
             "--slide-window",
@@ -91,18 +92,18 @@ def arguments():
     return parser.parse_args()
 
 
-# def run_a_model(model, X_train, X_test, y_train, y_test, n_classes):
-#     if model == 'svm':
-#         svmreport, parameter_list = svm(X_train, X_test, y_train, y_test)
-#         return svmreport, parameter_list
-#     elif model == 'rf':
-#         rfreport, parameter_list = forester(X_train, X_test, y_train, y_test, n_classes)
-#         return rfreport, parameter_list
-#     elif model == 'nb':
-#         kmreport, parameter_list = naive_bayes(X_train, X_test, y_train, y_test)
-#                 #returns something different than the other models
-#                 #because its unsupervised.
-#     return kmreport, parameter_list
+def run_a_model(model, X_train, X_test, y_train, y_test, n_classes):
+    if model == 'svm':
+        svmreport, parameter_list = svm(X_train, X_test, y_train, y_test)
+        return svmreport, parameter_list
+    elif model == 'rf':
+        rfreport, parameter_list = forester(X_train, X_test, y_train, y_test, n_classes)
+        return rfreport, parameter_list
+    elif model == 'nb':
+        kmreport, parameter_list = naive_bayes(X_train, X_test, y_train, y_test)
+                #returns something different than the other models
+                #because its unsupervised.
+    return kmreport, parameter_list
 
 
 def output_data(reportdf, model, key, output_filename = False):
@@ -133,13 +134,10 @@ def output_params(model_params, model, key, param_filename = False):
     paramdf.loc['0','parameters'] = [model_params]
     paramdf.loc['0','key'] = key
     if param_filename == False:
-                #paramdf = pd.DataFrame(columns=["model", "parameters", "key"], data = param_data)
         paramdf.to_csv(model + '_params.csv', index=False)
     elif os.path.exists(param_filename):
-               # paramdf = pd.DataFrame(param_data)
         paramdf.to_csv(param_filename, mode='a')
     else:
-               # paramdf = pd.DataFrame(columns=["model", "parameters", "key"], data = param_data)
         paramdf.to_csv(param_filename, index=False)
 
 
@@ -195,17 +193,15 @@ def class_identifier(df, c_o_i):
     return bdict, coi_list
 
     
-
+#REMOVE:
+# key func, params func/output, label func/output
+#multilabel options, 
 
 #TODO:
 # have the smallest class # dictate the neighbors for SMOTE/ADASYN
 # change flag to one outputfile prefix
 # tf = ag strike, hm = def strike, lc = motion, rz = rattling, adiw=feeding
 # rzadiw = inplace-moving lc =motion tfhm = striking
-# add option for multi-run with diff window sizes, 
-#for size in sizes:
-
-# add way to record options selected
 # allow for multiple csv inputs, 
     #check if the output prepped csv already exists
 
@@ -223,13 +219,6 @@ def main():
     df = df.rename(columns={'Behavior':'behavior'})
     key = construct_key(args.model, args.window_size)
     classdict, presentclasses = class_identifier(df, args.classes_of_interest)
-    #classdict = {'s': 0, 'l': 1, 'c': 1, 'h':2, 'm':3, 'a': 4, 'd': 5, 'i': 6, 'w': 7, 'r':8, 'z':9, 't': 10} # l&c combined
-   # presentclasses = ['s', 'l&c', 'h', 'm', 'a', 'd', 'i', 'w', 'r', 'z', 't']
-    # classdict = {'s': 0, 'l': 1, 't': 2, 'c': 1, 'a': 3, 'd': 3, 'i': 3, 'w': 3, 'r':4, 'z':4, 'h':2, 'm':2} #6class
-    # presentclasses = ['s', 'l&c', 'all_strike', 'feeding', 'rattle']
-    # classdict = {'s': 0, 'l': 1, 'c': 1, 'h':2, 'm':2, 'a': 3, 'd': 4, 'i': 5, 'w': 6, 'r':7, 'z':7, 't': 8} # 9class
-    # presentclasses = ['s', 'l&c', 'def_strike', 'a', 'd', 'i', 'w', 'rattle', 'agg_strike']
-    #classdict = {'s': 0, 'l': 1, 't': 2, 'c': 1, 'a': 3, 'd': 3, 'i': 3, 'w': 3, 'r':3, 'z':3, 'h':2, 'm':2} #4class
     if args.slide_window:
         windows, actual_classes = slide_window(df, int(args.window_size), args.classes_of_interest)
         Xdata, ydata = multilabel_xy(windows, classdict)
@@ -246,7 +235,7 @@ def main():
         writer = csv.writer(f)
         writer.writerows(total_data)
 
-    """
+    
     n_samples, n_features, n_classes = Xdata.shape[0], Xdata.shape[1]*Xdata.shape[2], len(presentclasses)
     X_train, X_test, y_train, y_test = reduce_dim_sampler(Xdata,ydata, args.oversample)
     report, recall_matrix, precision_matrix, parameters = forester(X_train, X_test, y_train, y_test, len(actual_classes), actual_classes, args.data_output_file)
@@ -275,7 +264,7 @@ def main():
     # recall_heatmapper(conmatrixdf, args.data_output_file)
     # precision_heatmapper(conmatrixdf, args.data_output_file)
 
-"""
+
 if __name__ == "__main__":
     main()
 
