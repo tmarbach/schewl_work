@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import csv
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
+from imblearn.under_sampling import RandomUnderSampler
 
 
 
@@ -67,6 +68,8 @@ def accel_oversampler(Xdata,ydata, sample_flag = False):
         X_resampled, y_resampled = SMOTE(k_neighbors=2).fit_resample(Xdata2d, ydata)
     elif sample_flag == 'a':
         X_resampled, y_resampled = ADASYN(n_neighbors=2).fit_resample(Xdata2d, ydata)
+    elif sample_flag == 'u':
+        X_resampled, y_resampled = RandomUnderSampler(random_state=0).fit_resample(Xdata2d, ydata)
     else:
         X_resampled, y_resampled = Xdata2d, ydata
 
