@@ -1,11 +1,8 @@
-import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
-
-
 
 def singleclass_leaping_window(df, window_size, coi=False):
     """
@@ -142,45 +139,6 @@ def multiclass_leaping_window(df, window_size, coi=False):
     print("Windows pulled")
     return windows, list(allclasses)
 
-
-
-
-#multiclass labeling each windows, used with either sliding/leaping windows
-def multilabel_xy(windows, classdict):
-    """
-    Input:
-        windows -- list of dataframes of all one class 
-    Output:
-        Xdata -- arrays of xyz data of each window stacked together
-        ydata -- binary multiclass labels of each class present in each window
-    """
-    positions = ['accX', 'accY', 'accZ']
-    Xdata, ydata = [], []
-    for window in windows:
-        Xdata.append(window[positions].to_numpy())
-        bclass = list(window.behavior.unique().sum())
-        numlist = [classdict[yval] for yval in bclass]
-        ydata.append(numlist)
-    return np.stack(Xdata), MultiLabelBinarizer().fit_transform(ydata)
-
-
-#single class labeling each window, use with pull windows
-def singlelabel_xy(windows, classdict):
-    """
-    Input:
-        windows -- list of dataframes of all one class 
-    Output:
-        Xdata -- arrays of xyz data of each window stacked together
-        ydata -- integer class labels for each window
-    """
-    positions = ['accX', 'accY', 'accZ']
-    Xdata, ydata = [], []
-    for window in windows:
-        Xdata.append(window[positions].to_numpy())
-        ydata.append(classdict[window['behavior'].iloc[0]])
-    return np.stack(Xdata), np.asarray(ydata)
-
-
 #stratified random sample of training data
 def reduce_dim_strat(Xdata,ydata):
     nsamples, nx, ny = Xdata.shape
@@ -219,10 +177,13 @@ def reduce_dim_strat_over(Xdata,ydata):
 
 
 
-def reduce_dim_sampler(Xdata,ydata, sample_flag = False):
+def reduce_dim_sampler(Xdata, ydata, sample_flag = False):
     """
     Reduces the dimensions of inout data, splits into train/test set,
-    then randomly oversamples the minority classes to match the majority class"""
+    then randomly oversamples the minority classes to match the majority class
+    """
+
+    # reduce dim sampler only does the sampling technique on the train.
     nsamples, nx, ny = Xdata.shape
     Xdata2d = Xdata.reshape((nsamples,nx*ny))
     stshsp = StratifiedShuffleSplit(n_splits= 1, test_size =0.2, random_state=42)
@@ -240,18 +201,3 @@ def reduce_dim_sampler(Xdata,ydata, sample_flag = False):
         X_resampled, y_resampled = x_train, y_train
     print("train/test sets stratified and split")
     return X_resampled, x_test, y_resampled, y_test
-
-
-
-
-def main():
-    pull_window(df, window_size)
-    slide_window(df, window_size)
-    leaping_window(df, window_size)
-    singlelabel_xy(windows, classdict)
-    multilabel_xy(windows, classdict)
-    reduce_dim_strat(Xdata,ydata)
-    reduce_dimensions(Xdata,ydata)
-
-if __name__ == "__main__":
-    main()
