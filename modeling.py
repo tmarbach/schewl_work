@@ -44,7 +44,7 @@ def run_model(model_selection, X_train, X_test, y_train, y_test, n_classes):
     elif model_selection == 'nb':
         report, parameter_list = naive_bayes(X_train, X_test, y_train, y_test)
     else: # Default to random forest model
-        report, parameter_list = forester(X_train, X_test, y_train, y_test, n_classes)
+        report, parameter_list = random_forest(X_train, X_test, y_train, y_test, n_classes)
 
     return report, parameter_list
 
