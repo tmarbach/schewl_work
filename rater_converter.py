@@ -1,32 +1,9 @@
-from distutils.command.clean import clean
 import pandas as pd
 import numpy as np
 import csv
+from window_maker import pull_window
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
 from imblearn.under_sampling import RandomUnderSampler
-
-
-
-def pull_window(df, window_size):
-    """
-    Input: 
-    df -- dataframe of cleaned input data, likely from a csv
-    window_size -- number of rows of data to convert to 1 row for AcceleRater (25 = 1sec)
-    Output:
-    windows -- list of lists of accel data (EX:[x,y,z,...,x,y,z,class_label])
-    """
-    if window_size > df.shape[0]:
-        raise ValueError('Window larger than data given')
-    windows = []
-    number_of_rows_minus_window = df.shape[0] - window_size + 1
-    for i in range(0, number_of_rows_minus_window, window_size):
-        window = df[i:i+window_size]
-        if len(set(window.behavior)) != 1:
-            continue
-        if len(set(np.ediff1d(window.input_index))) != 1:
-             continue
-        windows.append(window)
-    return windows
 
 
 def accel_singlelabel_xy(windows):
@@ -104,18 +81,3 @@ def rater_construct_train_test(windows):
     return total_data
 
 
-def main():
-    df = pd.read_csv("~/CNNworkspace/raterdata/dec21_cleanPennf1.csv")
-    df = df.loc[df['behavior'] != 'l']
-    windows = pull_window(df, 25)
-    all_data = rater_construct_train_test(windows)
-    with open("CNNworkspace/raterdata/nostill_Pennf1flat_data.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerows(all_data)
-
-
-#TODO:
-    # write script to clean data, option for training and test/raw data
-
-if __name__ == "__main__":
-    main()
