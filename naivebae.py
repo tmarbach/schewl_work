@@ -3,10 +3,6 @@ from sklearn.metrics import classification_report
 from sklearn.preprocessing import MinMaxScaler
 
 
-#gonna have to transform the input data so that no negative numbers are used
-
-
-
 def naive_bayes(X_train, X_test, y_train, y_test):
     scaler = MinMaxScaler()
     X_train = scaler.fit_transform(X_train)
