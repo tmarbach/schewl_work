@@ -3,80 +3,80 @@
 import os
 import pandas as pd
 
+# Column Names
+BEHAVIOR = 'Behavior'
+ACCELERATION_X = 'accX'
+ACCELERATION_Y = 'accY'
+ACCELERATION_Z = 'accZ'
+WARNING_COLUMN_MISSING = " column is missing"
+COLUMN_NAMES = [ BEHAVIOR,
+            ACCELERATION_X, 
+            ACCELERATION_Y, 
+            ACCELERATION_Z ]
+
+def prepare_dataset(raw_dataset_path):
+    if os.path.isdir(raw_dataset_path):
+        df = directory_cleaner(raw_dataset_path)
+    elif os.path.isfile(raw_dataset_path):
+        if "prepped_" in os.path.basename(raw_dataset_path):
+            df = pd.read_csv(raw_dataset_path)
+        else:
+            df = csv_cleaner(raw_dataset_path)
+            output_prepped_data(raw_dataset_path, df)
+    else:
+        print("ERROR: YOUR PATH SUX")
 
 
+def accumulate_csv_files(data_set_path):
+    """
+    """
+    files = []
+    for file in os.listdir(data_set_path):
+        if file.endswith('.csv'):
+            files.append(file)
+            
+    return files
 
-def accel_data_csv_cleaner(accel_data_csv):
-    df = pd.read_csv(accel_data_csv)
-    if 'Behavior' not in df.columns:
-        raise ValueError("'Behavior' column is missing")
-    if 'accX' not in df.columns:
-        raise ValueError("'accX' column is missing")
-    if 'accY' not in df.columns:
-        raise ValueError("'accY' column is missing")
-    if 'accZ' not in df.columns:
-        raise ValueError("'accZ' column is missing")
+def column_warnings(columns):
+    """
+    Inform the user if the data is not as expected
+    """
+    if BEHAVIOR not in columns:
+        raise ValueError(f"{BEHAVIOR}' {WARNING_COLUMN_MISSING}")
+    if ACCELERATION_X not in columns:
+        raise ValueError(f"{ACCELERATION_X}' {WARNING_COLUMN_MISSING}")
+    if ACCELERATION_Y not in columns:
+        raise ValueError(f"{ACCELERATION_Y}' {WARNING_COLUMN_MISSING}")
+    if ACCELERATION_Z not in columns:
+        raise ValueError(f"{ACCELERATION_Z}' {WARNING_COLUMN_MISSING}")
+
+def csv_cleaner(csv_filepath):
+    """
+    """
+    df = pd.read_csv(csv_filepath, low_memory=False)
+    column_warnings()
+
     df['input_index'] = df.index
-    cols_at_front = ['Behavior',
-                     'accX', 
-                     'accY', 
-                     'accZ']
-    df = df[[c for c in cols_at_front if c in df]+
-            [c for c in df if c not in cols_at_front]]
-                   # check for correct number of columns, then check for correct column titles
-    # need to check if the first 1 or 2 time signatures (sampling) have 25 entries, if not, kick an error
-    #df['Behavior'] = df['Behavior'].fillna('u')
-    #df['Behavior'] = df['Behavior'].replace(['n'],'u')
-    df= df.dropna(subset=['Behavior'])
-    df = df.loc[df['Behavior'] != 'n']
-    
-    #CURRENTLY removing "no video class" class
-    #SET to removing unlabeled data and no video data. keeping labeled class data
+    df = df[[c for c in COLUMN_NAMES if c in df] + [c for c in df if c not in COLUMN_NAMES]]
+
+    df= df.dropna(subset=[BEHAVIOR])
+    df = df.loc[df[BEHAVIOR] != 'n']
+    df = df.rename(columns = {BEHAVIOR : 'behavior'})
     return df
 
+def directory_cleaner(data_set_path):
+    """
+    """
+    collected_dfs = []
+    files = accumulate_csv_files(data_set_path)
 
-def accel_data_dir_cleaner(accel_data_csv):
-    files = [f for f in os.listdir(accel_data_csv) if f.endswith('.csv')]
-    fulldf = []
     for csv in files:
-        adf = pd.read_csv(csv, low_memory=False)
-        if 'Behavior' not in adf.columns:
-            raise ValueError("'Behavior' column is missing")
-        if 'accX' not in adf.columns:
-            raise ValueError("'accX' column is missing")
-        if 'accY' not in adf.columns:
-            raise ValueError("'accY' column is missing")
-        if 'accZ' not in adf.columns:
-            raise ValueError("'accZ' column is missing")
-        fulldf.append(adf)
-    df = pd.concat(fulldf)    
-    df['input_index'] = df.index
-    cols_at_front = ['Behavior',
-                     'accX', 
-                     'accY', 
-                     'accZ']
-    df = df[[c for c in cols_at_front if c in df]+
-            [c for c in df if c not in cols_at_front]]
-    df= df.dropna(subset=['Behavior'])
-    df = df.loc[df['Behavior'] != 'n']
-    #CURRENTLY removing "no video class" class
-    #SET to removing unlabeled data and no video data. keeping labeled class data
-    return df
+        accelerometry_df = csv_cleaner(csv)
+        collected_dfs.append(accelerometry_df)
 
+    combined_df = pd.concat(collected_dfs)
+    return combined_df
 
 def output_prepped_data(original_data, clean_csv_df):
     filename = os.path.basename(original_data)
     clean_csv_df.to_csv('prepped_'+filename, index=False)
-    
-
-
-
-
-def main(input_csv):
-    clean_data = accel_data_csv_cleaner(input_csv)    
-    output_prepped_data(input_csv, clean_data)
-    return clean_data
-
-
-if __name__ == "__main__":
-    main()
