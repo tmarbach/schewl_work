@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-
-
 import pandas as pd
 import argparse
 
@@ -9,20 +7,13 @@ import argparse
 from accelml_prep_csv import prepare_dataset 
 
 # Data Tranformations and Model Preparation
-from sliding_window import singleclass_leaping_window_exclusive
-from sliding_window import slide_window, reduce_dim_sampler
+from sliding_window import singleclass_leaping_window_exclusive, reduce_dim_sampler
 from transformations import transform_xy
 from rater_converter import rater_construct_train_test, accel_singlelabel_xy, accel_oversampler
 
 # Models
-from naivebae import naive_bayes
-from random_forest import forester
-from svm import svm
+from model import naive_bayes, svm, random_forest
 
-# python3 modeling.py -i input_oreganus_rawdata.csv --sampling u --window_size 15 --classes slthmw -f undersmpling_sltw_15.csv
-#-s
-#-w
-#-c
 def retrieve_arguments():
     parser = argparse.ArgumentParser(
             prog='model_select', 
