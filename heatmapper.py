@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-
+import seaborn as sns
 
 def show_values(pc, fmt="%.2f", **kw):
     '''
@@ -9,8 +8,6 @@ def show_values(pc, fmt="%.2f", **kw):
     '''
     pc.update_scalarmappable()
     ax = pc.axes
-    #ax = pc.axes# FOR LATEST MATPLOTLIB
-    #Use zip BELOW IN PYTHON 3
     for p, color, value in zip(pc.get_paths(), pc.get_facecolors(), pc.get_array()):
         x, y = p.vertices[:-2, :].mean(0)
         if np.all(color[:3] > 0.5):
@@ -79,10 +76,7 @@ def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=4
 
     # resize 
     fig = plt.gcf()
-    #fig.set_size_inches(cm2inch(40, 20))
-    #fig.set_size_inches(cm2inch(40*4, 20*4))
     fig.set_size_inches(cm2inch(figure_width, figure_height))
-
 
 
 def plot_classification_report(classification_report, title='Classification report ', cmap='RdBu'):
@@ -118,6 +112,21 @@ def plot_classification_report(classification_report, title='Classification repo
     correct_orientation = False
     heatmap(np.array(plotMat), title, xlabel, ylabel, xticklabels, yticklabels, figure_width, figure_height, correct_orientation, cmap=cmap)
 
+
+def recall_heatmapper(conf_matrix_df, output_fig_name):
+    df_norm_col=(conf_matrix_df-conf_matrix_df.mean())/conf_matrix_df.std()
+    sns.heatmap(df_norm_col, annot=True, fmt='g')
+    # sns.set(font_scale=1.2) # for label size
+    plt.savefig('recall' + str(output_fig_name))
+    plt.close
+
+def precision_heatmapper(conf_matrix_df, output_fig_name):
+    df_norm_row = conf_matrix_df.apply(lambda x: (x-x.mean())/x.std(), axis = 1)
+    sns.heatmap(df_norm_row, annot=True, fmt='g', cmap = 'viridis')
+    # plt.figure(figsize=(15,15))
+    # sns.set(font_scale=1.2) # for label size
+    plt.savefig('precision-' + str(output_fig_name))
+    plt.close
 
 def main():
     plot_classification_report(sampleClassificationReport)

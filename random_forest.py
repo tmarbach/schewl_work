@@ -1,13 +1,9 @@
-from pickle import TRUE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 
-
 def forester(X_train, X_test, y_train, y_test, n_classes, classnames, output_fig_name):
-    #parameters = {"estimators":1000,"leaf nodes":n_classes, "jobs":-1}
-    full_behavior= ['t','c','a','d','i','w','h','s','l','z','r','m']
     rnd_clf=RandomForestClassifier(
         n_estimators=1000,
         max_leaf_nodes=n_classes,
@@ -26,13 +22,13 @@ def forester(X_train, X_test, y_train, y_test, n_classes, classnames, output_fig
         y_pred_rf,
         normalize = 'true'
         #labels=classnames
-         )
+        )
     precision_matrix = confusion_matrix(
         y_test,
         y_pred_rf,
         normalize = 'pred'
         #labels=classnames
-         )
+        )
     parameters = rnd_clf.get_params()
     ConfusionMatrixDisplay.from_predictions(y_test, y_pred_rf,display_labels=classnames,include_values = False,normalize= 'true')
     plt.savefig('recall-' + str(output_fig_name))
