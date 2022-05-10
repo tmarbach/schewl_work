@@ -35,7 +35,7 @@ def retrieve_arguments():
     return parser.parse_args()
 
 
-def run_model(model_selection, X_train, X_test, y_train, y_test, n_classes):
+def run_model(model_selection, X_train, X_test, y_train, y_test):
     """
     
     """
@@ -44,12 +44,13 @@ def run_model(model_selection, X_train, X_test, y_train, y_test, n_classes):
     elif model_selection == 'nb':
         report, parameter_list = naive_bayes(X_train, X_test, y_train, y_test)
     else: # Default to random forest model
-        report, parameter_list = random_forest(X_train, X_test, y_train, y_test, n_classes)
+        report, parameter_list = random_forest(X_train, X_test, y_train, y_test, CLASSES_OF_INTEREST_LIST)
 
     return report, parameter_list
 
 WINDOW_SIZE = 25
 CLASSES_OF_INTEREST = "hlmstw"
+CLASSES_OF_INTEREST_LIST = ['h','l','m','s','t','w']
 CLASS_INDICES = {
     0: 'h',
     1: 'l',
@@ -59,7 +60,7 @@ CLASS_INDICES = {
     5: 'w',
 }
 
-PATH = "./dataset/"
+PATH = "./dataset_subset/"
 
 def main(args):
     df = prepare_dataset(PATH)
@@ -69,17 +70,18 @@ def main(args):
     X_train, X_test, y_train, y_test = reduce_dim_sampler(Xdata, ydata, args.oversample)
 
     # Run Model based on argument selection
-    report, parameter_list = run_model(X_train, X_test, y_train, y_test, len(CLASSES_OF_INTEREST))
+    report, parameter_list = run_model(X_train, X_test, y_train, y_test)
     reportdf = pd.DataFrame(report).transpose()
 
-    # EXTRAS for Reporting
-    #n_samples, n_features, n_classes = Xdata.shape[0], Xdata.shape[1]*Xdata.shape[2], len(actual_classes) # keep this line to compare to each time we run how the oversampling techniques get done
-    # key = construct_key(args.model, WINDOW_SIZE)
-    # output_data(reportdf,args.model, key, args.data_output_file)
+    # Use heatmapper to output statistics
     # recall_matrixdf = pd.DataFrame(recall_matrix, index = actual_classes,columns = actual_classes)
     # recall_matrixdf.to_csv(args.label_output_file)
     # precision_matrixdf = pd.DataFrame(precision_matrix, index = actual_classes,columns = actual_classes)
     # precision_matrixdf.to_csv(args.param_output_file)
+
+    # EXTRAS for Reporting
+    # key = construct_key(args.model, WINDOW_SIZE)
+    # output_data(reportdf,args.model, key, args.data_output_file)
 
 if __name__ == "__main__":
     args = retrieve_arguments()

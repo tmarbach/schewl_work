@@ -14,11 +14,18 @@ COLUMN_NAMES = [ BEHAVIOR,
             ACCELERATION_Y, 
             ACCELERATION_Z ]
 
+# Columsn for dropping
+DROP_COLUMN_NAMES = ["Temp. (?C)", "Battery Voltage (V)", "Metadata", 'input_index', 'TagID']
+
+# Preppared Suffix
+PREPPED = "prepped_"
+
 def prepare_dataset(raw_dataset_path):
     if os.path.isdir(raw_dataset_path):
         df = directory_cleaner(raw_dataset_path)
+        output_prepped_data(raw_dataset_path, df)
     elif os.path.isfile(raw_dataset_path):
-        if "prepped_" in os.path.basename(raw_dataset_path):
+        if PREPPED in os.path.basename(raw_dataset_path):
             df = pd.read_csv(raw_dataset_path)
         else:
             df = csv_cleaner(raw_dataset_path)
@@ -26,14 +33,13 @@ def prepare_dataset(raw_dataset_path):
     else:
         print("ERROR: YOUR PATH SUX")
 
-
 def accumulate_csv_files(data_set_path):
     """
     """
     files = []
     for file in os.listdir(data_set_path):
         if file.endswith('.csv'):
-            files.append(file)
+            files.append(data_set_path + file)
             
     return files
 
@@ -52,16 +58,20 @@ def column_warnings(columns):
 
 def csv_cleaner(csv_filepath):
     """
+
     """
     df = pd.read_csv(csv_filepath, low_memory=False)
-    column_warnings()
+    column_warnings(df.columns)
 
     df['input_index'] = df.index
     df = df[[c for c in COLUMN_NAMES if c in df] + [c for c in df if c not in COLUMN_NAMES]]
 
-    df= df.dropna(subset=[BEHAVIOR])
+    df = df.dropna(subset=[BEHAVIOR])
     df = df.loc[df[BEHAVIOR] != 'n']
-    df = df.rename(columns = {BEHAVIOR : 'behavior'})
+    df = df.drop(DROP_COLUMN_NAMES, axis=1)
+
+    # Issue with some column headers have caps issue
+    df = df.rename(columns={ BEHAVIOR : 'behavior' })
     return df
 
 def directory_cleaner(data_set_path):
@@ -79,4 +89,4 @@ def directory_cleaner(data_set_path):
 
 def output_prepped_data(original_data, clean_csv_df):
     filename = os.path.basename(original_data)
-    clean_csv_df.to_csv('prepped_'+filename, index=False)
+    clean_csv_df.to_csv(PREPPED + filename, index=False)

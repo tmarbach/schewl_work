@@ -17,6 +17,19 @@ def show_values(pc, fmt="%.2f", **kw):
         ax.text(x, y, fmt % value, ha="center", va="center", color=color, **kw)
 
 
+def base_statistics(Xdata, classes):
+    """
+    Statistics used to compare different sampling techniques
+
+    returns
+        Number of:
+            Samples
+            Features
+            Classes
+    """
+    n_samples, n_features, n_classes = Xdata.shape[0], Xdata.shape[1]*Xdata.shape[2], len(classes) 
+    return (n_samples, n_features, n_classes)
+
 def cm2inch(*tupl):
     '''
     Specify figure size in centimeter in matplotlib

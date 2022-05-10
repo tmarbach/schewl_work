@@ -5,10 +5,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report
 
-def random_forest(X_train, X_test, y_train, y_test, n_classes, classnames):
+def random_forest(X_train, X_test, y_train, y_test, clases_names):
     rnd_clf=RandomForestClassifier(
         n_estimators=1000,
-        max_leaf_nodes=n_classes,
+        max_leaf_nodes=len(clases_names),
         n_jobs=-1)
 
     rnd_clf.fit(X_train,y_train)
@@ -16,7 +16,7 @@ def random_forest(X_train, X_test, y_train, y_test, n_classes, classnames):
     report = classification_report(
         y_test,
         y_pred_rf, 
-        target_names = classnames,
+        target_names = clases_names,
         output_dict=True)
 
     parameters = rnd_clf.get_params()
@@ -26,16 +26,18 @@ def random_forest(X_train, X_test, y_train, y_test, n_classes, classnames):
 
 def naive_bayes(X_train, X_test, y_train, y_test):
     scaler = MinMaxScaler()
+
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
+
     clf = ComplementNB()
     clf.fit(X_train, y_train)
-    ypred = clf.predict(X_test)
+    y_pred = clf.predict(X_test)
     report = classification_report(
         y_test,
-        ypred, 
-        output_dict=True
-        )
+        y_pred, 
+        output_dict=True)
+
     parameters = clf.get_params()
     # return report, parameters (dict with parameter names mapped to values)
     return report, parameters
