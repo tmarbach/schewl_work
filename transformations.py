@@ -1,7 +1,13 @@
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 
+#TODO REMOVE THIS
+from sliding_window import BEHAVIOR
+
+def bucket_strikes(df):
+    # Bucketing the behavior to be categorized as strike
+    strikes = ['h', 'm']
+    df[BEHAVIOR] = df[BEHAVIOR].replace(strikes, 't')
+    return df
 
 def transform_xy(windows, classdict):
     """
@@ -16,7 +22,7 @@ def transform_xy(windows, classdict):
         Xdata -- arrays of xyz data of each window stacked together
         ydata -- integer class labels for each window
     """
-    positions = ['accX', 'accY', 'accZ']
+    positions = ['ACCX', 'ACCY', 'ACCZ']
     strikes = ['h', 'm']
 
     Xdata, ydata = [], []
@@ -26,8 +32,13 @@ def transform_xy(windows, classdict):
         alldata = np.append(alldata, np.float32([window[positions].std(axis = 0)]), 0)
 
         Xdata.append(alldata)
-        behavior = window['behavior'].iloc[0]
+        behavior = window[BEHAVIOR].iloc[0]
+
+        # Bucketing the behavior to be categorized as strike
         if behavior in strikes:
-                behavior  = 't'
+            behavior = 't'
+
         ydata.append(classdict[behavior])
+
+    # Double check what asArray does
     return np.stack(Xdata), np.asarray(ydata)

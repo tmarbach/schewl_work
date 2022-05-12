@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
 
+#Performs Data Cleaning
+
 import os
 import pandas as pd
 
 # Column Names
-BEHAVIOR = 'Behavior'
-ACCELERATION_X = 'accX'
-ACCELERATION_Y = 'accY'
-ACCELERATION_Z = 'accZ'
+BEHAVIOR = 'BEHAVIOR'
+ACCELERATION_X = 'ACCX'
+ACCELERATION_Y = 'ACCY'
+ACCELERATION_Z = 'ACCZ'
 WARNING_COLUMN_MISSING = " column is missing"
+NEW_INDEX = 'INPUT_INDEX'
 COLUMN_NAMES = [ BEHAVIOR,
             ACCELERATION_X, 
             ACCELERATION_Y, 
             ACCELERATION_Z ]
 
-# Columsn for dropping
-DROP_COLUMN_NAMES = ["Temp. (?C)", "Battery Voltage (V)", "Metadata", 'input_index', 'TagID']
-
 # Preppared Suffix
 PREPPED = "prepped_"
 
 def prepare_dataset(raw_dataset_path):
+    """
+    
+    """
+    df = None
     if os.path.isdir(raw_dataset_path):
         df = directory_cleaner(raw_dataset_path)
-        output_prepped_data(raw_dataset_path, df)
+        output_prepped_data(raw_dataset_path + "meh", df)
     elif os.path.isfile(raw_dataset_path):
+        # Dataset has already been preppared read the file
         if PREPPED in os.path.basename(raw_dataset_path):
             df = pd.read_csv(raw_dataset_path)
         else:
@@ -32,6 +37,8 @@ def prepare_dataset(raw_dataset_path):
             output_prepped_data(raw_dataset_path, df)
     else:
         print("ERROR: YOUR PATH SUX")
+
+    return df
 
 def accumulate_csv_files(data_set_path):
     """
@@ -61,17 +68,22 @@ def csv_cleaner(csv_filepath):
 
     """
     df = pd.read_csv(csv_filepath, low_memory=False)
+
+    # Remove case sensitivity from column names
+    upper_case_column_names = [columns_name.upper() for columns_name in df.columns]
+    df.columns = upper_case_column_names
+
     column_warnings(df.columns)
 
-    df['input_index'] = df.index
+    df[NEW_INDEX] = df.index
     df = df[[c for c in COLUMN_NAMES if c in df] + [c for c in df if c not in COLUMN_NAMES]]
 
     df = df.dropna(subset=[BEHAVIOR])
     df = df.loc[df[BEHAVIOR] != 'n']
-    df = df.drop(DROP_COLUMN_NAMES, axis=1)
 
-    # Issue with some column headers have caps issue
-    df = df.rename(columns={ BEHAVIOR : 'behavior' })
+    drop_column_names = set(df.columns) - set(COLUMN_NAMES)
+    df = df.drop(drop_column_names, axis=1)
+
     return df
 
 def directory_cleaner(data_set_path):
@@ -88,5 +100,8 @@ def directory_cleaner(data_set_path):
     return combined_df
 
 def output_prepped_data(original_data, clean_csv_df):
+    """
+    
+    """
     filename = os.path.basename(original_data)
-    clean_csv_df.to_csv(PREPPED + filename, index=False)
+    clean_csv_df.to_csv(PREPPED + filename + ".csv", index=False)

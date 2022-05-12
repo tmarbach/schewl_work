@@ -4,15 +4,17 @@ import pandas as pd
 import argparse
 
 # Data Read and Initial Clean-up
-from accelml_prep_csv import prepare_dataset 
+from clean_acceleration_data import prepare_dataset 
 
 # Data Tranformations and Model Preparation
-from sliding_window import singleclass_leaping_window_exclusive, reduce_dim_sampler
-from transformations import transform_xy
-from rater_converter import rater_construct_train_test, accel_singlelabel_xy, accel_oversampler
+from sliding_window import singleclass_leaping_window_exclusive, prepared_samples
+from transformations import bucket_strikes, transform_xy
 
 # Models
 from model import naive_bayes, svm, random_forest
+
+# Metrics
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 def retrieve_arguments():
     parser = argparse.ArgumentParser(
@@ -50,14 +52,14 @@ def run_model(model_selection, X_train, X_test, y_train, y_test):
 
 WINDOW_SIZE = 25
 CLASSES_OF_INTEREST = "hlmstw"
-CLASSES_OF_INTEREST_LIST = ['h','l','m','s','t','w']
+CLASSES_OF_INTEREST_LIST = ['l','s','t','w']
 CLASS_INDICES = {
-    0: 'h',
-    1: 'l',
-    2: 'm',
-    3: 's',
-    4: 't',
-    5: 'w',
+    'h' : 0,
+    'l' : 1,
+    'm':  2,
+    's' : 3,
+    't' : 4,
+    'w' : 5,
 }
 
 PATH = "./dataset_subset/"
@@ -65,12 +67,12 @@ PATH = "./dataset_subset/"
 def main(args):
     df = prepare_dataset(PATH)
 
-    windows, actual_classes = singleclass_leaping_window_exclusive(df, WINDOW_SIZE, CLASSES_OF_INTEREST)
+    windows, classes_found = singleclass_leaping_window_exclusive(df, WINDOW_SIZE, CLASSES_OF_INTEREST)
     Xdata, ydata = transform_xy(windows, CLASS_INDICES)
-    X_train, X_test, y_train, y_test = reduce_dim_sampler(Xdata, ydata, args.oversample)
+    X_train, X_test, y_train, y_test = prepared_samples(Xdata, ydata, args.oversample)
 
     # Run Model based on argument selection
-    report, parameter_list = run_model(X_train, X_test, y_train, y_test)
+    report, parameter_list = run_model(args.model, X_train, X_test, y_train, y_test)
     reportdf = pd.DataFrame(report).transpose()
 
     # Use heatmapper to output statistics

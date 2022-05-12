@@ -16,7 +16,6 @@ def show_values(pc, fmt="%.2f", **kw):
             color = (1.0, 1.0, 1.0)
         ax.text(x, y, fmt % value, ha="center", va="center", color=color, **kw)
 
-
 def base_statistics(Xdata, classes):
     """
     Statistics used to compare different sampling techniques
