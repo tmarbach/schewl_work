@@ -1,20 +1,20 @@
-#!/usr/bin/env python3
-
 import pandas as pd
 import argparse
 
 # Data Read and Initial Clean-up
-from clean_acceleration_data import prepare_dataset 
+from clean_acceleration_data import clean_dataset 
 
 # Data Tranformations and Model Preparation
-from sliding_window import singleclass_leaping_window_exclusive, prepared_samples
-from transformations import bucket_strikes, transform_xy
+from sliding_window import singleclass_leaping_window_exclusive, prepare_train_test_data
+from transformations import transform_xy
+from dataset_defintions import *
 
 # Models
 from model import naive_bayes, svm, random_forest
 
 # Metrics
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 def retrieve_arguments():
     parser = argparse.ArgumentParser(
@@ -31,7 +31,7 @@ def retrieve_arguments():
             "-o",
             "--oversample",
             help = "Flag to oversample the minority classes: o -- oversample, s -- SMOTE, or a -- ADASYN ",
-            default=False, 
+            default='ns', 
             type=str 
             )
     return parser.parse_args()
@@ -42,48 +42,45 @@ def run_model(model_selection, X_train, X_test, y_train, y_test):
     
     """
     if model_selection == 'svm':
-        report, parameter_list = svm(X_train, X_test, y_train, y_test)
+        report, parameter_list, classes = svm(X_train, X_test, y_train, y_test)
     elif model_selection == 'nb':
-        report, parameter_list = naive_bayes(X_train, X_test, y_train, y_test)
+        report, parameter_list, classes = naive_bayes(X_train, X_test, y_train, y_test)
     else: # Default to random forest model
-        report, parameter_list = random_forest(X_train, X_test, y_train, y_test, CLASSES_OF_INTEREST_LIST)
+        report, parameter_list, classes = random_forest(X_train, X_test, y_train, y_test, CLASSES_OF_INTEREST_LIST)
 
-    return report, parameter_list
-
-WINDOW_SIZE = 25
-CLASSES_OF_INTEREST = "hlmstw"
-CLASSES_OF_INTEREST_LIST = ['l','s','t','w']
-CLASS_INDICES = {
-    'h' : 0,
-    'l' : 1,
-    'm':  2,
-    's' : 3,
-    't' : 4,
-    'w' : 5,
-}
+    return report, parameter_list, classes
 
 PATH = "./dataset_subset/"
 
 def main(args):
-    df = prepare_dataset(PATH)
+    # Int
+    df = clean_dataset(PATH)
 
     windows, classes_found = singleclass_leaping_window_exclusive(df, WINDOW_SIZE, CLASSES_OF_INTEREST)
     Xdata, ydata = transform_xy(windows, CLASS_INDICES)
-    X_train, X_test, y_train, y_test = prepared_samples(Xdata, ydata, args.oversample)
+    X_train, X_test, y_train, y_test = prepare_train_test_data(Xdata, ydata, args.oversample)
 
     # Run Model based on argument selection
-    report, parameter_list = run_model(args.model, X_train, X_test, y_train, y_test)
-    reportdf = pd.DataFrame(report).transpose()
+    report, y_pred, classes = run_model(args.model, X_train, X_test, y_train, y_test)
 
-    # Use heatmapper to output statistics
-    # recall_matrixdf = pd.DataFrame(recall_matrix, index = actual_classes,columns = actual_classes)
-    # recall_matrixdf.to_csv(args.label_output_file)
-    # precision_matrixdf = pd.DataFrame(precision_matrix, index = actual_classes,columns = actual_classes)
-    # precision_matrixdf.to_csv(args.param_output_file)
 
-    # EXTRAS for Reporting
-    # key = construct_key(args.model, WINDOW_SIZE)
-    # output_data(reportdf,args.model, key, args.data_output_file)
+    # 
+    model_name = MODEL_NAMES[args.model]
+    sampling_technique_name = SAMPLING_TECHNIQUE_NAMES[args.oversample]
+    configuration = str(model_name + '_' + sampling_technique_name)
+
+    cm = confusion_matrix(y_test, y_pred, labels=classes)
+    display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASSES_OF_INTEREST_LIST)
+    display.plot()
+    display.ax_.set_title(configuration)
+    plt.savefig(str("./figures/" + configuration + '.png'))
+
+    report = pd.DataFrame(report).transpose()
+
+    result_path = str('./results/' + configuration + '.xlsx') 
+    with pd.ExcelWriter(result_path, engine='xlsxwriter') as writer:
+        report.to_excel(writer, index=False)
+
 
 if __name__ == "__main__":
     args = retrieve_arguments()

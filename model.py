@@ -23,13 +23,11 @@ def random_forest(X_train, X_test, y_train, y_test, clases_names):
     y_pred=rf_clf.predict(X_test)
     report = classification_report(
         y_test,
-        y_pred, 
+        y_pred,
         target_names = clases_names,
         output_dict=True)
 
-    parameters = rf_clf.get_params()
-
-    return report, parameters
+    return report, y_pred, rf_clf.classes_
 
 
 def naive_bayes(X_train, X_test, y_train, y_test):
@@ -53,11 +51,10 @@ def naive_bayes(X_train, X_test, y_train, y_test):
     y_pred = nb_clf.predict(X_test)
     report = classification_report(
         y_test,
-        y_pred, 
+        y_pred,
         output_dict=True)
 
-    parameters = nb_clf.get_params()
-    return report, parameters
+    return report, y_pred, nb_clf.classes_
 
 
 def svm(X_train, X_test, y_train, y_test, parameters={"degrees": 3, "C": 5, "kernel":"poly"}):
@@ -72,12 +69,10 @@ def svm(X_train, X_test, y_train, y_test, parameters={"degrees": 3, "C": 5, "ker
                 C = parameters["C"])),
     ])
     svm_clf.fit(X_train, y_train)
-    ypred = svm_clf.predict(X_test)
+    y_pred = svm_clf.predict(X_test)
     report = classification_report(
         y_test,
-        ypred, 
+        y_pred, 
         output_dict=True)
-    parameters = svm_clf.get_params()
-    
-    # return report, parameters (dict with parameter names mapped to values)
-    return report, parameters
+
+    return report, y_pred, svm_clf.classes_

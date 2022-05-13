@@ -1,12 +1,10 @@
 import numpy as np
-
-#TODO REMOVE THIS
+from dataset_defintions import *
 from sliding_window import BEHAVIOR
 
 def bucket_strikes(df):
     # Bucketing the behavior to be categorized as strike
-    strikes = ['h', 'm']
-    df[BEHAVIOR] = df[BEHAVIOR].replace(strikes, 't')
+    df[BEHAVIOR] = df[BEHAVIOR].replace(STRIKES, 't')
     return df
 
 def transform_xy(windows, classdict):
@@ -23,7 +21,6 @@ def transform_xy(windows, classdict):
         ydata -- integer class labels for each window
     """
     positions = ['ACCX', 'ACCY', 'ACCZ']
-    strikes = ['h', 'm']
 
     Xdata, ydata = [], []
     for window in windows:
@@ -35,7 +32,7 @@ def transform_xy(windows, classdict):
         behavior = window[BEHAVIOR].iloc[0]
 
         # Bucketing the behavior to be categorized as strike
-        if behavior in strikes:
+        if behavior in STRIKES:
             behavior = 't'
 
         ydata.append(classdict[behavior])

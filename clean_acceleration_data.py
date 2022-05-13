@@ -1,26 +1,17 @@
-#!/usr/bin/env python3
-
-#Performs Data Cleaning
-
 import os
 import pandas as pd
+from dataset_defintions import *
 
-# Column Names
-BEHAVIOR = 'BEHAVIOR'
-ACCELERATION_X = 'ACCX'
-ACCELERATION_Y = 'ACCY'
-ACCELERATION_Z = 'ACCZ'
-WARNING_COLUMN_MISSING = " column is missing"
-NEW_INDEX = 'INPUT_INDEX'
-COLUMN_NAMES = [ BEHAVIOR,
-            ACCELERATION_X, 
-            ACCELERATION_Y, 
-            ACCELERATION_Z ]
+
+"""
+FILE OVERVIEW:
+
+"""
 
 # Preppared Suffix
 PREPPED = "prepped_"
 
-def prepare_dataset(raw_dataset_path):
+def clean_dataset(raw_dataset_path):
     """
     
     """
@@ -63,15 +54,21 @@ def column_warnings(columns):
     if ACCELERATION_Z not in columns:
         raise ValueError(f"{ACCELERATION_Z}' {WARNING_COLUMN_MISSING}")
 
+def remove_case_sensitivity(df):
+    """
+    
+    """
+    upper_case_column_names = [columns_name.upper() for columns_name in df.columns]
+    df.columns = upper_case_column_names
+
+    return df
+
 def csv_cleaner(csv_filepath):
     """
 
     """
     df = pd.read_csv(csv_filepath, low_memory=False)
-
-    # Remove case sensitivity from column names
-    upper_case_column_names = [columns_name.upper() for columns_name in df.columns]
-    df.columns = upper_case_column_names
+    df = remove_case_sensitivity(df)
 
     column_warnings(df.columns)
 

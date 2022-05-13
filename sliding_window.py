@@ -1,16 +1,10 @@
 import numpy as np
-from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import StratifiedShuffleSplit
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
 
-# class SamplePreparation:
-#     """
-#     Given a Sliding Window strategy and a Sampling Strategy prepare data
-#     """
-
 BEHAVIOR = 'BEHAVIOR'
 
-def prepared_samples(Xdata, ydata, sample_flag=None):
+def prepare_train_test_data(Xdata, ydata, sample_flag=None):
     x_data_reduced = reduce_sample_dimension(Xdata)
     x_train, x_test, y_train, y_test = stratified_shuffle_split(
         x_data_reduced, ydata)
@@ -19,7 +13,6 @@ def prepared_samples(Xdata, ydata, sample_flag=None):
     x_train_resampled, y_train_resampled = sample_data(x_train, y_train, sample_flag)
 
     return x_train_resampled, x_test, y_train_resampled, y_test
-
 
 def check_data_size(window_size, data_shape):
     if window_size > data_shape:
@@ -110,14 +103,14 @@ def sample_data(x_data, y_data, sample_flag):
         ros = RandomOverSampler(random_state=0)
         X_resampled, y_resampled = ros.fit_resample(x_data, y_data)
     elif sample_flag == 's':
-        X_resampled, y_resampled = SMOTE(
-            k_neighbors=2).fit_resample(x_data, y_data)
+        X_resampled, y_resampled = SMOTE(k_neighbors=2).fit_resample(x_data, y_data)
     elif sample_flag == 'a':
-        X_resampled, y_resampled = ADASYN(
-            n_neighbors=2).fit_resample(x_data, y_data)
+        X_resampled, y_resampled = ADASYN(n_neighbors=2).fit_resample(x_data, y_data)
     else:
         # If no sample flag has been specified or the flag is not recognized,
         # do not apply a sample technique
         X_resampled, y_resampled = x_data, y_data
+
+    print(len(y_resampled))
 
     return X_resampled, y_resampled
