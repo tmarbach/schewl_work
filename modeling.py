@@ -1,22 +1,32 @@
-import pandas as pd
+"""
+File Overview
+--------------
+Entry point for running a selected model and sampling technique against the acceleration dataset
+"""
+
 import argparse
 
 # Data Read and Initial Clean-up
 from clean_acceleration_data import clean_dataset 
 
-# Data Tranformations and Model Preparation
-from sliding_window import singleclass_leaping_window_exclusive, prepare_train_test_data
-from transformations import transform_xy
+# Constants used to refer to the dataset post clean-up
 from dataset_defintions import *
+
+# Data Tranformations and Model Preparation
+from prepare_acceleration_data import reduce_sample_dimension, stratified_shuffle_split, apply_sampling
+from window_maker import singleclass_leaping_window
+from transformations import transform_xy
 
 # Models
 from model import naive_bayes, svm, random_forest
 
-# Metrics
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
+# Location of dataset
+PATH = "./dataset_subset/"
 
 def retrieve_arguments():
+    """
+    
+    """
     parser = argparse.ArgumentParser(
             prog='model_select', 
             description="Select a ML model to apply to acceleration data",
@@ -50,36 +60,36 @@ def run_model(model_selection, X_train, X_test, y_train, y_test):
 
     return report, parameter_list, classes
 
-PATH = "./dataset_subset/"
+
+def prepare_train_test_pipeline(windowed_X_data, y_data, sample_flag=None):
+    """
+    desc
+        Pipeline created to prepare windowed data, apply sampling techniques and
+        split into test and train. 
+    params
+        windowed_X_data - X data that has had a windowing technique applied
+        y_data          - ground truth
+        sample_flag     - sampling technique to be applied
+
+    """
+    x_data_reduced = reduce_sample_dimension(y_data)
+    x_train, x_test, y_train, y_test = stratified_shuffle_split(
+        x_data_reduced, y_data)
+
+    # reduce dimension sampler only does the sampling technique on the training data.
+    x_train_resampled, y_train_resampled = apply_sampling(x_train, y_train, sample_flag)
+
+    return x_train_resampled, x_test, y_train_resampled, y_test
 
 def main(args):
-    # Int
     df = clean_dataset(PATH)
 
-    windows, classes_found = singleclass_leaping_window_exclusive(df, WINDOW_SIZE, CLASSES_OF_INTEREST)
+    windows, classes_found = singleclass_leaping_window(df, WINDOW_SIZE, CLASSES_OF_INTEREST)
     Xdata, ydata = transform_xy(windows, CLASS_INDICES)
-    X_train, X_test, y_train, y_test = prepare_train_test_data(Xdata, ydata, args.oversample)
+    X_train, X_test, y_train, y_test = prepare_train_test_pipeline(Xdata, ydata, args.oversample)
 
     # Run Model based on argument selection
     report, y_pred, classes = run_model(args.model, X_train, X_test, y_train, y_test)
-
-
-    # 
-    model_name = MODEL_NAMES[args.model]
-    sampling_technique_name = SAMPLING_TECHNIQUE_NAMES[args.oversample]
-    configuration = str(model_name + '_' + sampling_technique_name)
-
-    cm = confusion_matrix(y_test, y_pred, labels=classes)
-    display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASSES_OF_INTEREST_LIST)
-    display.plot()
-    display.ax_.set_title(configuration)
-    plt.savefig(str("./figures/" + configuration + '.png'))
-
-    report = pd.DataFrame(report).transpose()
-
-    result_path = str('./results/' + configuration + '.xlsx') 
-    with pd.ExcelWriter(result_path, engine='xlsxwriter') as writer:
-        report.to_excel(writer, index=False)
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def random_forest(X_train, X_test, y_train, y_test, clases_names):
     report = classification_report(
         y_test,
         y_pred,
-        target_names = clases_names,
+        target_names=clases_names,
         output_dict=True)
 
     return report, y_pred, rf_clf.classes_

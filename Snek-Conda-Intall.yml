@@ -1,0 +1,11 @@
+name: Snek-Data
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - scikit-learn
+  - imbalanced-learn
+  - ipykernel
+  - openpyxl
+  - pyarrow
+  - xlsxwriter

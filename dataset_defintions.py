@@ -3,12 +3,16 @@ BEHAVIOR = 'BEHAVIOR'
 ACCELERATION_X = 'ACCX'
 ACCELERATION_Y = 'ACCY'
 ACCELERATION_Z = 'ACCZ'
-WARNING_COLUMN_MISSING = " column is missing"
 NEW_INDEX = 'INPUT_INDEX'
 COLUMN_NAMES = [ BEHAVIOR,
             ACCELERATION_X, 
             ACCELERATION_Y, 
             ACCELERATION_Z ]
+
+WARNING_COLUMN_MISSING = " column is missing"
+
+# Behavior that has no x,y,z
+NO_VIDEO = 'n'
 
 # Configuration
 WINDOW_SIZE = 25
@@ -22,7 +26,6 @@ CLASS_INDICES = {
     't' : 4,
     'w' : 5,
 }
-
 STRIKES = ['h', 'm']
 
 # Models

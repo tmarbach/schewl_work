@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Accelometry Model",
+            "name": "Run Accelerometry Model",
             "type": "python",
             "request": "launch",
             "program": "modeling.py",
             "console": "integratedTerminal",
             "args": [
-                    "-m","rf", 
-                    "-o", "SMOTE"
+                    "-m", "svm",
+                    "-o", "a",  
                 ],
             "justMyCode": true
         }
