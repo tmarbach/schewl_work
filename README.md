@@ -11,6 +11,7 @@ Otherwise Installation includes the following:
  - pyarrow v4.0.1 interoperability with pandas and numpy
  - xlsxwriter v3.03 writing to excel files
  - ipykernel v6.13.0 viewing the data visualization notebook
+ - matplotlib v3.5.1
 
 # Viewing Data Exploration
 The data visualizations of the intial exploration into the Snake Dataset are found in the data_exploration notebook.

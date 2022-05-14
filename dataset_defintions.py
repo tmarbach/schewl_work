@@ -1,4 +1,10 @@
-# Column Names
+"""
+File Overview
+--------------
+Contains constants relating the dataset that will be commonly referred to in the codebase
+"""
+
+# Column Related defintions
 BEHAVIOR = 'BEHAVIOR'
 ACCELERATION_X = 'ACCX'
 ACCELERATION_Y = 'ACCY'
@@ -9,15 +15,12 @@ COLUMN_NAMES = [ BEHAVIOR,
             ACCELERATION_Y, 
             ACCELERATION_Z ]
 
-WARNING_COLUMN_MISSING = " column is missing"
-
 # Behavior that has no x,y,z
 NO_VIDEO = 'n'
 
 # Configuration
 WINDOW_SIZE = 25
 CLASSES_OF_INTEREST = "hlmstw"
-CLASSES_OF_INTEREST_LIST = ['l','s','t','w']
 CLASS_INDICES = {
     'h' : 0,
     'l' : 1,
@@ -26,6 +29,9 @@ CLASS_INDICES = {
     't' : 4,
     'w' : 5,
 }
+# Post bucketizing of classes of interest
+CLASSES_OF_INTEREST_LIST = ['l','s','t','w']
+
 STRIKES = ['h', 'm']
 
 # Models
@@ -34,9 +40,9 @@ SVM = "SVM"
 NAIVE_BAYES = "Naive_Bayes"
 
 MODEL_NAMES = {
-    "rf": RANDOM_FOREST,
+    "rf"  : RANDOM_FOREST,
     "svm" : SVM,
-    "nb" : NAIVE_BAYES,
+    "nb"  : NAIVE_BAYES,
 }
 
 # Types of Sampling

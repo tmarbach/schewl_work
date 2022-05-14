@@ -1,3 +1,9 @@
+"""
+File Overview
+--------------
+Function for preparing a cleaned acceleration dataframe for training and testing with a Model
+"""
+
 from sklearn.model_selection import StratifiedShuffleSplit
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN
 
@@ -37,6 +43,13 @@ def apply_sampling(X_data, y_data, sample_flag):
     """
     desc
         then randomly oversamples the minority classes to match the majority class
+    params
+        X_data      - sample data
+        y_data      - ground truth of the samples
+        sample_flag - designation of what sampling strategy should be used
+    return
+        X_resampled - sample data with sampling technique applied
+        y_resampled - resized array of the ground truth labels to match sampled data
     """
     if sample_flag == 'o':
         ros = RandomOverSampler(random_state=0)

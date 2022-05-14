@@ -11,7 +11,13 @@ import matplotlib.pyplot as plt
 
 def create_configuration_name(selected_model, selected_sampling):
     """
-    
+    desc
+        create a name for the configuration being done
+    params
+        selected_model      - the model that will be run
+        selected_sampling   - the sampling technique applied to the testing data
+    return
+        configuration_name  - a string indicting the model and sampling technique selected
     """
     model_name = MODEL_NAMES[selected_model]
     sampling_technique_name = SAMPLING_TECHNIQUE_NAMES[selected_sampling]
@@ -49,6 +55,7 @@ def save_results(confusion_matrix, report, configuration_name="output"):
     plt.savefig(str("./figures/" + configuration_name + '.png'))
 
     report = pd.DataFrame(report).transpose()
+    
     # The index is lost when being written to an excel sheet
     # Add index back in as a column at the beginning of the dataframe
     report.insert(0, "Index", report.index)

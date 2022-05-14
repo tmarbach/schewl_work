@@ -1,5 +1,6 @@
-
 """
+File Overview
+--------------
 Contains all modeling stratgies to be used with Acceleration Data
 """
 
@@ -12,7 +13,17 @@ from sklearn.metrics import classification_report
 
 def random_forest(X_train, X_test, y_train, y_test, clases_names):
     """
-    
+    desc
+        Run the Random Forest algorithm against the given test and train data.
+    params
+        X_train     - samples to train on
+        X_test      - samples to test on
+        y_train     - ground truth of training data
+        y_test      - ground truth of test data
+        parameters  - parameters for the SVM model, default it given
+    return
+        report  -   includes accuracy, percision per-class, 
+                    recall per-class, macro average and weigted average
     """
     rf_clf=RandomForestClassifier(
         n_estimators=1000,
@@ -33,13 +44,16 @@ def random_forest(X_train, X_test, y_train, y_test, clases_names):
 def naive_bayes(X_train, X_test, y_train, y_test):
     """
     desc
-
+        Run the Naive Bayes algorithm against the given test and train data.
     params
-    
-
-    return 
-        return report,
-        parameters (dict with parameter names mapped to values)
+        X_train     - samples to train on
+        X_test      - samples to test on
+        y_train     - ground truth of training data
+        y_test      - ground truth of test data
+        parameters  - parameters for the SVM model, default it given
+    return
+        report  -   includes accuracy, percision per-class, 
+                    recall per-class, macro average and weigted average
     """
     scaler = MinMaxScaler()
 
@@ -59,7 +73,17 @@ def naive_bayes(X_train, X_test, y_train, y_test):
 
 def svm(X_train, X_test, y_train, y_test, parameters={"degrees": 3, "C": 5, "kernel":"poly"}):
     """
-    
+    desc
+        Run the Support Vector Machine algorithm against the given test and train data.
+    params
+        X_train     - samples to train on
+        X_test      - samples to test on
+        y_train     - ground truth of training data
+        y_test      - ground truth of test data
+        parameters  - parameters for the SVM model, default it given
+    return
+        report  -   includes accuracy, percision per-class, 
+                    recall per-class, macro average and weigted average
     """
     svm_clf = Pipeline([
             ("scalar", StandardScaler()),

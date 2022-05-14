@@ -1,16 +1,16 @@
 import numpy as np
 from dataset_defintions import *
 
-def transform_xy(windows, classdict):
+def transform_xy(windows, class_dict):
     """
-    Purpose:
+    desc:
         Converts list of single class dataframes to two arrays
         Xdata (all raw/transformed datapoints) & ydata (class label).
         transformations included per axis :
             mean, std, min, max, kurtosis, skew, corr (xy, yz, xz)
-    Input:
+    params:
         windows -- list of dataframes of all one class
-    Output:
+    return:
         Xdata -- arrays of xyz data of each window stacked together
         ydata -- integer class labels for each window
     """
@@ -27,8 +27,9 @@ def transform_xy(windows, classdict):
 
         # Bucketing the behavior to be categorized as strike
         if behavior in STRIKES:
+            # t designates a general strike behavior
             behavior = 't'
 
-        ydata.append(classdict[behavior])
+        ydata.append(class_dict[behavior])
 
     return np.stack(Xdata), np.asarray(ydata)
