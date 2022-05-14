@@ -39,13 +39,19 @@ def clean_dataset(dataset_path):
 
     return df
 
-def accumulate_csv_files(data_set_path):
+def accumulate_csv_files(directory_path):
     """
+    desc
+        Collects all the names of csv file in a given directory
+    params
+        directory_path - path to the csv directory
+    return
+        files - list of csv files in the directory
     """
     files = []
-    for file in os.listdir(data_set_path):
+    for file in os.listdir(directory_path):
         if file.endswith('.csv'):
-            files.append(data_set_path + file)
+            files.append(directory_path + file)
             
     return files
 

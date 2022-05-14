@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "args": [
                     "-m", "svm",
-                    "-o", "a",  
+                    "-o", "s",  
                 ],
             "justMyCode": true
         }

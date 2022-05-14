@@ -17,13 +17,39 @@ Otherwise Installation includes the following:
 The data visualizations of the intial exploration into the Snake Dataset are found in the data_exploration notebook.
 
 # Running Model
-Run modeling.py
+Run modeling.py via the command line or the launch.json via VScode.
 
-## VS Code
+## Optional Arguments
+ -m : Specify ML model
+    options
+      rf: Random Forest
+      nb: Naive Bayes
+      svm: Support Vector Machines
+    default
+      Random Forest
+ -o : The sampling type
+    options
+      o: oversampling
+      s: SMOTE
+      a: ADASYN
+    default
+      ns: no sampling applied
 
+## Running the code
+### VS Code
+Change the flags in the args list in the launch.json.
+The following is an example of running and SVM model with a SMOTE sampling technique.
+  "args": [
+    "-m", "svm",
+     "-o", "s"]
 
-## Arguments
+### Run Via Command Line
+#### With default paramters
+./model.py 
 
+#### With paramters
+Example of running with a Naive Bayes modeling with an Oversampling technique
+./model.py -m nb -o o
 
 
 

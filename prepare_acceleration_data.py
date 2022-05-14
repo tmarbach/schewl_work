@@ -60,7 +60,7 @@ def apply_sampling(X_data, y_data, sample_flag):
         X_resampled, y_resampled = ADASYN(n_neighbors=2).fit_resample(X_data, y_data)
     else:
         # If no sample flag has been specified or the flag is not recognized,
-        # do not apply a sample technique
+        # do not apply a sampling technique
         X_resampled, y_resampled = X_data, y_data
 
     return X_resampled, y_resampled
